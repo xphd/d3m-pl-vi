@@ -1,0 +1,42 @@
+{
+  "pipeline": {
+    "id": "5cfc03a1-dce9-468c-8fcf-0bb4c2c80e66",
+    "source": null,
+    "created": null,
+    "context": "PRETRAINING",
+    "name": "dsbox_140351148300184",
+    "description": "",
+    "users": [],
+    "inputs": [{ "name": "input dataset" }],
+    "outputs": [
+      { "name": "predictions of input dataset", "data": "steps.0.produce" }
+    ],
+    "steps": [
+      {
+        "step": "primitive",
+        "primitive": {
+          "primitive": {
+            "id": "36d5472c-e0a4-4ed6-a1d0-2665feacff39",
+            "version": "1.0.1",
+            "python_path": "d3m.primitives.sri.baseline.MeanBaseline",
+            "name": "Mean Baseline",
+            "digest": "ca06b57c82f5a578e9f38f927fe7c9b0562fea4a43327430df9c9bf4c1c490cc"
+          },
+          "arguments": {
+            "inputs": {
+              "argument": "container",
+              "container": { "data": "inputs.0" },
+              "data": null
+            }
+          },
+          "outputs": [{ "id": "produce" }],
+          "hyperparams": {},
+          "users": []
+        },
+        "pipeline": null,
+        "placeholder": null
+      }
+    ]
+  },
+  "steps": []
+}

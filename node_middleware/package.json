@@ -1,0 +1,19 @@
+{
+  "name": "node_middleware",
+  "version": "1.0.0",
+  "description": "",
+  "main": "node_backend_app.js",
+  "scripts": {
+    "start": "node_backend_app.js",
+    "server": "nodemon node_backend_app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socketio": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
