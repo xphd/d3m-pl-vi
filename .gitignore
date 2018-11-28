@@ -1,2 +1,5 @@
 node_middleware/node_modules/
 vue_frontend/node_modules/
+
+node_middleware/package-lock.json
+vue_frontend/package-lock.json
