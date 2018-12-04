@@ -2,7 +2,10 @@
   <div>
     <h1>Flow Chart</h1>
     <VueFlowy :chart="chart"></VueFlowy>
-    <!-- <button @click="requestFlowchart()">Get Flowchat</button> -->
+    <div align="left">
+      <p>pipeline</p>
+      <json-viewer :value="pipeline" :expand-depth="5" copyable boxed sort></json-viewer>
+    </div>
   </div>
 </template>
 
@@ -15,7 +18,7 @@ export default {
   },
   data: () => ({
     chart: new FlowChart(),
-    pipeline: null   
+    pipeline: null
   }),
   sockets: {
     connect() {
@@ -25,47 +28,43 @@ export default {
     responseFlowchart: function(pipeline) {
       console.log(pipeline.steps);
       this.pipeline = pipeline;
-      
-      const elementId = {'id':0};
+
+      const elementId = { id: 0 };
       branch(pipeline, this.chart, elementId);
 
-      function branch(pipeline, chart, elementId){
-        if (pipeline==null) {
-          return null; 
+      function branch(pipeline, chart, elementId) {
+        if (pipeline == null) {
+          return null;
         }
         let head = null;
         let pre = null;
         let cur = null;
-        
+
         let steps = pipeline.steps;
-        for (let i = 0; i < steps.length;i++){
-          let step = steps[i];          
-          let name = step["primitive"]["primitive"]["name"];          
-          let element = chart.addElement(elementId.id, { label: name});
+        for (let i = 0; i < steps.length; i++) {
+          let step = steps[i];
+          let name = step["primitive"]["primitive"]["name"];
+          let element = chart.addElement(elementId.id, { label: name });
           elementId.id += 1;
 
           cur = element;
-          if (i == 0){
+          if (i == 0) {
             head = element;
             pre = element;
-          } 
-          if (i>0){
+          }
+          if (i > 0) {
             pre.leadsTo(cur);
-          }   
-          if (step.pipeline){
-            console.log("Step "+i+" not null") 
-            let branchHead = branch(step.pipeline, chart,elementId)
-            cur.leadsTo(branchHead)     
+          }
+          if (step.pipeline) {
+            console.log("Step " + i + " not null");
+            let branchHead = branch(step.pipeline, chart, elementId);
+            cur.leadsTo(branchHead);
           }
           pre = cur;
-          
         }
-        
+
         return head;
       }
-
-
-      
     }
   },
   mounted() {
