@@ -1,8 +1,9 @@
 <template>
   <div>
     <h1>Flow Chart</h1>
-    <vue-mermaid :nodes="nodes" v-if="reset"></vue-mermaid>
-    <!-- <VueFlowy :chart="chart"></VueFlowy> -->
+    <button @click="showPipeline()" v-show="isPipelineShown">Hide</button>
+    <button @click="showPipeline()" v-show="!isPipelineShown">Show</button>
+    <vue-mermaid :nodes="nodes" v-if="isPipelineShown"></vue-mermaid>
     <div align="left">
       <p>pipeline</p>
       <json-viewer :value="pipeline" :expand-depth="5" copyable boxed sort></json-viewer>
@@ -11,25 +12,13 @@
 </template>
 
 <script>
-// import { VueFlowy, FlowChart } from "vue-flowy";
 export default {
   name: "FlowChart",
-  // components: {
-  //   VueFlowy
-  // },
   data() {
     return {
       title: "Flow Chart!",
-      reset: true,
-      nodes: [
-        { id: "1", text: "A12333333333333", next: ["2"] },
-        { id: "2", text: "B1222222224", next: ["3"] },
-        { id: "3", text: "Casgfadfbgfdsbgfsnbh", next: ["4", "6"] },
-        { id: "4", text: "Dsafqwgafdgea", next: ["5"] },
-        { id: "5", text: "E" },
-        { id: "6", text: "Fawerqagavds" }
-      ],
-      // chart: new FlowChart(),
+      isPipelineShown: false,
+      nodes: [{ id: "-1", text: "Begin", next: ["0"] }],
       pipeline: null
     };
   },
@@ -43,56 +32,22 @@ export default {
       this.pipeline = pipeline;
 
       const elementId = { id: 0 };
-      // branch(pipeline, this.chart, elementId);
-
-      // function branch(pipeline, chart, elementId) {
-      //   if (pipeline == null) {
-      //     return null;
-      //   }
-      //   let head = null;
-      //   let pre = null;
-      //   let cur = null;
-
-      //   let steps = pipeline.steps;
-      //   for (let i = 0; i < steps.length; i++) {
-      //     let step = steps[i];
-      //     let name = step["primitive"]["primitive"]["name"];
-      //     let element = chart.addElement(elementId.id, { label: name });
-      //     elementId.id += 1;
-
-      //     cur = element;
-      //     if (i == 0) {
-      //       head = element;
-      //       pre = element;
-      //     }
-      //     if (i > 0) {
-      //       pre.leadsTo(cur);
-      //     }
-      //     if (step.pipeline) {
-      //       console.log("Step " + i + " not null");
-      //       let branchHead = branch(step.pipeline, chart, elementId);
-      //       cur.leadsTo(branchHead);
-      //     }
-      //     pre = cur;
-      //   }
-
-      //   return head;
-      // }
+      let steps = pipeline.steps;
+      for (let i = 0; i < steps.length; i++) {
+        let step = steps[i];
+        let name = step["primitive"]["primitive"]["name"];
+        let node = { id: elementId.id, text: name, next: [elementId.id + 1] };
+        this.nodes.push(node);
+        elementId.id += 1;
+      }
+      this.isPipelineShown = true;
     }
   },
-  mounted() {
-    // const idea = this.chart.addElement("idea");
-    // const A = this.chart.addElement("a", {
-    //   label: "vscode"
-    // });
-    // const B = this.chart.addElement("b", {
-    //   label: "github"
-    // });
-    // const C = this.chart.addElement("c", {
-    //   label: "npm"
-    // });
-    // idea.leadsTo(A).leadsTo(B);
-    // A.leadsTo(C);
+  methods: {
+    showPipeline() {
+      console.log(this.isPipelineShown);
+      this.isPipelineShown = !this.isPipelineShown;
+    }
   }
 };
 </script>
