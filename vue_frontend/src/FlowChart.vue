@@ -1,9 +1,19 @@
 <template>
   <div>
     <h1>Flow Chart</h1>
-    <button @click="showPipeline()" v-show="isPipelineShown">Hide</button>
-    <button @click="showPipeline()" v-show="!isPipelineShown">Show</button>
+    <div align="left" v-for="item in nodes" :key="item.id">
+      <input type="checkbox" :id="item.id" :value="item.id" v-model="nodesPicked">
+      <label for="jack">{{item.text}}</label>
+    </div>
+    <span>Select Primitives: {{ nodesPicked }}</span>
+
+    <div>
+      <button @click="showPipeline()" v-show="isPipelineShown">Hide Flowchart</button>
+      <button @click="showPipeline()" v-show="!isPipelineShown">Show Flowchart</button>
+    </div>
+
     <vue-mermaid :nodes="nodes" v-if="isPipelineShown"></vue-mermaid>
+
     <div align="left">
       <p>pipeline</p>
       <json-viewer :value="pipeline" :expand-depth="5" copyable boxed sort></json-viewer>
@@ -18,8 +28,9 @@ export default {
     return {
       title: "Flow Chart!",
       isPipelineShown: false,
-      nodes: [{ id: "-1", text: "Begin", next: ["0"] }],
-      pipeline: null
+      nodesPicked: [],
+      nodes: [],
+      pipeline: {}
     };
   },
   sockets: {
@@ -28,24 +39,41 @@ export default {
       this.$socket.emit("requestFlowchart");
     },
     responseFlowchart: function(pipeline) {
-      console.log(pipeline.steps);
+      // console.log(pipeline.steps);
       this.pipeline = pipeline;
-
       const elementId = { id: 0 };
-      let steps = pipeline.steps;
-      for (let i = 0; i < steps.length; i++) {
-        let step = steps[i];
-        let name = step["primitive"]["primitive"]["name"];
-        let node = { id: elementId.id, text: name, next: [elementId.id + 1] };
-        this.nodes.push(node);
-        elementId.id += 1;
-      }
       this.isPipelineShown = true;
+      branch(this.pipeline, this.nodes, elementId);
+      function branch(pipeline, nodes, elementId) {
+        if (pipeline == null) {
+          return;
+        }
+        let steps = pipeline.steps;
+        for (let i = 0; i < steps.length; i++) {
+          let step = steps[i];
+          let name = step["primitive"]["primitive"]["name"];
+          let id = elementId.id;
+          let node = {
+            id: id,
+            text: id + ": " + name,
+            next: [id + 1]
+          };
+          if (i == steps.length - 1 && !step.pipeline) {
+            node.next = [];
+          }
+          nodes.push(node);
+          elementId.id += 1;
+          if (step.pipeline) {
+            branch(step.pipeline, nodes, elementId);
+            node.next.push(elementId.id);
+          }
+        }
+      }
     }
   },
   methods: {
     showPipeline() {
-      console.log(this.isPipelineShown);
+      // console.log(this.isPipelineShown);
       this.isPipelineShown = !this.isPipelineShown;
     }
   }
